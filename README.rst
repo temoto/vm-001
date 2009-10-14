@@ -8,6 +8,31 @@ This is a simple concurrent virtual machine. It can run many internal threads in
 Python is chosen as fast prototyping language.
 
 
+What i've learned
+=================
+
+- Yay! Virtual machines work! :)
+- It is stupid easy to create a stupid virtual machine
+- Shared-state threads aren't bad or ugly while you only read from other virtual threads.
+- Problem #1: scheduling virtual threads execution. This may be done in numerous different ways.
+
+  Assign a single virtual thread to single real executor (OS thread, CPU, etc) is probably the simplest, but definately not the best option.
+
+  Then, choosing how much instructions to execute before yielding control to another virtual thread is another problem.
+
+  Executing at most N instructions is probably simplest, but obviously not the best solution.
+
+  *Note*: The problem of scheduling instructions is a bit wider because sometimes
+  some parts of code inside single virtual thread may be paralleled as well (implicit micro threads, instruction level parallelism).
+  But i haven't got into that yet.
+
+- Problem #2: sleeping and resuming virtual threads. Waiting for other virtual threads to finish. More generally, event system.
+
+  Clearly, virtual machine needs some kind of event system, at least to react on outside world events. Interrupts in x86 computers is an example of such event system.
+
+  My effort in doing event system for vm-001 drown in locks. Need a good design on thread-safe multi-producer, multi-consumer event dispatcher.
+
+
 VM specification
 ================
 
