@@ -17,46 +17,71 @@ There are 8 (without a reason) thread-local registers named r0, r1, ... r7.
 And 8 global registers named g0, g1, ... g7.
 
 
-Instructions::
+Instructions:
 
-    * `copy D S` copies value of thread-local register S to thread-local register D. Same as assembler instruction `mov`.
-    * `gcopy D S` copies value of register S to register D. Any or both registers may be global.
-      Copying from or to global register is special because it locks register for concurrent reading/writing.
+`copy D S`
+    copies value of thread-local register S to thread-local register D. Same as assembler instruction `mov`.
+`gcopy D S`
+    copies value of register S to register D. Any or both registers may be global.
 
-    * `set R val` sets thread-local register R to some constant value, which may be a constant expression, like '3 + 5'.
-    * `gset R val` sets global register R to some constant value.
+    Copying from or to global register is special because it locks register for concurrent reading/writing.
 
-    * `swap R1 R2` swaps values of two thread-local registers.
+`set R val`
+    sets thread-local register R to some constant value, which may be a constant expression, like '3 + 5'.
+`gset R val`
+    sets global register R to some constant value.
 
-    * `eval D op R1 R2` puts result of evaluation `R1 op R2` into register D. All registers must be thread-local.
-      See operators below.
+`swap R1 R2`
+    swaps values of two thread-local registers.
 
-    * `jump R` unconditionally jumps to instruction pointed by thread-local register R.
-    * `jz A E` jumps to instruction A if register E is equal to zero.
-      A may be a constant address or thread-local register. E must be thread-local register.
-    * `jnz A E` same as `jz`, but tests for `E != 0`.
-    * `addr R` puts current instruction address to thread-local register R.
+`eval D op R1 R2`
+    puts result of evaluation `R1 op R2` into register D. All registers must be thread-local.
 
-    * `spawn D A` spawns new thread with starting instruction A. A may be a constant address or thread-local register.
-      New thread's registers are copied from its parent.
-      Puts id of new thread into register D.
-    * `spawna D A` same as `spawn`, but VM deletes new thread when it does `tstop`.
-      Name 'spawna' means SPAWN Automatically deleted thread.
-    * `tself D` puts id of current thread into register D.
-    * `tget D T S` inter-thread `copy` of register S in thread T into register D in current thread.
-    * `twait T` stops current thread, until thread T is not stopped. When thread T does `tstop`, current thread resumes execution.
-    * `tstop` stops current thread.
-      Do this in main thread to gracefully shutdown VM.
-    * `tdel T` deletes thread T. After this instruction, `tget _ T _` and `twait T` will crash VM.
+    See operators below.
 
-    * `print R` prints the value in thread-local register R.
+`jump R`
+    unconditionally jumps to instruction pointed by thread-local register R.
+`jz A E`
+    jumps to instruction A if register E is equal to zero.
 
-Operators::
+    A may be a constant address or thread-local register. E must be thread-local register.
+`jnz A E`
+    same as `jz`, but tests for `E != 0`.
+`addr R`
+    puts current instruction address to thread-local register R.
 
-    * math: -, +, *, /. Math operators evaluate to integer number.
-      `/` is integer division. Division by zero crashes the VM. Division is rounded towards zero.
+`spawn D A`
+    spawns new thread with starting instruction A. A may be a constant address or thread-local register.
 
-    * logic: <, >, <=, >=, ==, !=. Logic operators evaluate to 1 for true and 0 for false.
+    New thread's registers are copied from its parent.
+    Puts id of new thread into register D.
+`spawna D A`
+    same as `spawn`, but VM deletes new thread when it does `tstop`.
+    Name 'spawna' means SPAWN Automatically deleted thread.
+`tself D`
+    puts id of current thread into register D.
+`tget D T S`
+    inter-thread `copy` of register S in thread T into register D in current thread.
+`twait T`
+    stops current thread, until thread T is not stopped. When thread T does `tstop`, current thread resumes execution.
+`tstop`
+    stops current thread.
+    Do this in main thread to gracefully shutdown VM.
+`tdel T`
+    deletes thread T. After this instruction, `tget _ T _` and `twait T` will crash VM.
+
+`print R`
+    prints the value in thread-local register R.
+
+Operators:
+
+math:
+  -, +, \*, /. Math operators evaluate to integer number.
+
+  `/` is integer division. Division by zero crashes the VM. Division is rounded towards zero.
+
+logic:
+  <, >, <=, >=, ==, !=. Logic operators evaluate to 1 for true and 0 for false.
 
 
 Sample
